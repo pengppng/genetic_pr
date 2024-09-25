@@ -1,3 +1,4 @@
+# this is for random for test mtDNA
 import random
 
 def generate_random_dna_sequence(length=30):
