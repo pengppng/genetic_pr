@@ -40,45 +40,94 @@ def compare_STR_locus(data_A, data_B):
 
     # Summary
     if is_match:
-        return "Both sets are identical. Conclusion: Yes"
+        return "Both sets are identical.\n Conclusion: Yes, they are family"
     else:
-        return f"STR Locus differences found: {differences}. Conclusion: No"
+        return f"STR Locus differences found: {differences}.\n Conclusion: No, He is not his father"
 
 # Function to compare loci for SSR profiling
 def compare_loci_by_locus(data, loci_names):
     # Compare two loci sets and count matching alleles
-    def check_differences(child_loci, person_loci):
-        return sum(1 for a, b in zip(child_loci, person_loci) if a == b)
+    def check_differences(child_loci, mother_loci, person_loci):
+        # Child should get one allele from mother, and the other from either the Father or Boyfriend
+        child_from_mother = [allele for allele in child_loci if allele in mother_loci]
+        child_from_person = [allele for allele in child_loci if allele not in mother_loci]
+        
+        # Check if the alleles from the person match with the remaining child alleles
+        matches = sum(1 for a in child_from_person if a in person_loci)
+        return matches
+
+    # Check if the data is incomplete (less than 8 loci or more than 2 alleles in a locus)
+    def is_incomplete(data):
+        if len(loci_names) < 8:
+            return True
+        for person, loci_list in data.items():
+            for loci in loci_list:
+                if len(loci) > 2:  # More than 2 alleles in a locus
+                    return True
+        return False
+
+    # Check if anyone has received a bone marrow transplant
+    def has_bone_marrow_transplant(transplant_info):
+        return any(transplant_info.values())
+
+    # Example: transplant_info dictionary indicating who received bone marrow transplant
+    transplant_info = {
+        'Mother': False,
+        'Child': False,
+        'Boyfriend': False,
+        'Father': False
+    }
+
+    # If the data is incomplete or someone received a bone marrow transplant
+    if is_incomplete(data) or has_bone_marrow_transplant(transplant_info):
+        print("Incomplete analysis: Less than 8 loci, more than 2 alleles at a locus, or bone marrow transplant detected.")
+        return
 
     child = data['Child']
+    mother = data['Mother']
 
     # Summary for each locus comparison
     print("=== Detailed STR Profiling by Locus ===")
+    total_scores = {'Boyfriend': 0, 'Father': 0}
+
     for i, locus in enumerate(loci_names):
         print(f"\nLocus: {locus}")
 
-        # Extract the loci values for the child and other individuals
+        # Extract the loci values for the child, mother, and other individuals
         child_loci = child[i]  # Loci for the child
+        mother_loci = mother[i]  # Loci for the mother
         comparisons = {}
 
-        # Compare with Mother, Boyfriend, and Father
-        for person in ['Mother', 'Boyfriend', 'Father']:
+        # Compare with Boyfriend and Father
+        for person in ['Boyfriend', 'Father']:
             person_loci = data[person][i]  # Loci for each person
-            # Count how many values match with the child at this locus
-            matches = check_differences(child_loci, person_loci)
+            # Count how many values match with the child at this locus (excluding mother)
+            matches = check_differences(child_loci, mother_loci, person_loci)
             comparisons[person] = matches
+            total_scores[person] += matches  # Update total score for this person
 
         # Sort by who has the most matches with the child at this locus
         sorted_comparisons = sorted(comparisons.items(), key=lambda x: x[1], reverse=True)
 
         # Output results for this locus
         for person, matches in sorted_comparisons:
-            print(f"{person} matches {matches}/2 alleles.")
+            print(f"{person} matches {matches}/1 alleles (excluding mother's contribution).")
         
         # Show the closest match for this locus
         print(f"Most likely match at {locus}: {sorted_comparisons[0][0]}")
 
-    print("\n=== Summary Completed ===")
+    print("\n=== Total Score Summary ===")
+    print(f"Boyfriend total score: {total_scores['Boyfriend']}")
+    print(f"Father total score: {total_scores['Father']}")
+
+    # Conclusion: Who is more likely to be the father
+    if total_scores['Boyfriend'] > total_scores['Father']:
+        print("\nConclusion: The Boyfriend is more likely to be the father.")
+    elif total_scores['Boyfriend'] < total_scores['Father']:
+        print("\nConclusion: The Father is more likely to be the father.")
+    else:
+        print("\nConclusion: Both Boyfriend and Father are equally likely to be the father.")
+
 
 # Main function to allow user to select the function
 def main():
@@ -98,7 +147,7 @@ def main():
 
     elif choice == '2':
         # Compare STR Locus between A and B
-        # Data from the image can be used or user input can be added here
+        # 1.Data from STRlocus.txt
         data_A = [
             ("D8S1179", 11, 16),
             ("D21S11", 29, 31.2),
@@ -136,7 +185,28 @@ def main():
             ("D5S818", 10, 12),
             ("FGA", 20, 21)
         ]
+        # # 2.case want to  add data by yourself
+        # loci_names = [
+        #     "D8S1179", "D21S11", "D7S820", "CSF1PO", "D3S1358", "TH01", "D13S317",
+        #     "D16S539", "D2S1338", "D19S433", "vWA", "TPOX", "D18S51", "Amelogenin", "D5S818", "FGA"
+        # ]
 
+        # data_A = []
+        # data_B = []
+
+        # # Input data for A and B
+        # for locus in loci_names:
+        #     print(f"Enter alleles for STR locus: {locus}")
+
+        #     alleles_A = input(f"Person A alleles for {locus} (separated by space): ").split()
+        #     alleles_A = [int(a) if a.isdigit() else a for a in alleles_A]
+        #     data_A.append((locus, *alleles_A))
+
+        #     alleles_B = input(f"Person B alleles for {locus} (separated by space): ").split()
+        #     alleles_B = [int(b) if b.isdigit() else b for b in alleles_B]
+        #     data_B.append((locus, *alleles_B))
+
+        # Compare the two sets of STR data
         result = compare_STR_locus(data_A, data_B)
         print(result)
 
@@ -146,13 +216,14 @@ def main():
             'Mother': [(21, 23), (8, 10), (12, 13), (14, 18), (10, 11), (13, 14), (31.2, 32.2), (6, 9), (16, 17), (11, 14), (8, 12), (11, 13), (9, 10), (11, 12), (7, 8)],
             'Child': [(22, 23), (8, 11), (12, 13), (14, 14), (11, 16), (14, 14), (30, 32.2), (6, 9.3), (16, 17), (11, 14), (8, 11), (9, 13), (8, 9), (12, 11), (11, 12)],
             'Boyfriend': [(21, 22), (11, 11), (13, 13), (17, 18), (10, 11), (14, 17), (30, 30), (5, 6), (15, 15), (11, 14), (8, 11), (9, 13), (8, 8), (7, 12), (11, 12)],
+            #Father of Mother
             'Father': [(20, 22), (11, 11), (13, 13), (14, 15), (14, 16), (14, 17), (29, 30), (6, 9.3), (15, 17), (11, 12), (12, 12), (9, 10), (8, 9), (10, 13), (11, 12)]
         }
 
         loci_names = [
             'FGA', 'TPOX', 'D8S1179', 'vWA', 'Penta E', 'D18S51', 
             'D21S11', 'TH01', 'D3S1358', 'Penta D', 'CSF1PO', 
-            'D16S539', 'D7S820', 'D13S317', 'D5S818'
+            'D16S539', 'D7S820', 'D13S317', 'D5S818' #15 locate
         ]
 
         compare_loci_by_locus(data, loci_names)

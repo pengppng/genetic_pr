@@ -1,0 +1,106 @@
+
+data_A = [
+            ("D8S1179", 11, 16),
+            ("D21S11", 29, 31.2),
+            ("D7S820", 10, 11),
+            ("CSF1PO", 12, 12),
+            ("D3S1358", 15, 15),
+            ("TH01", 7, 9),
+            ("D13S317", 8, 12),
+            ("D16S539", 9, 12),
+            ("D2S1338", 18, 19),
+            ("D19S433", 13, 14),
+            ("vWA", 14, 17),
+            ("TPOX", 8, 8),
+            ("D18S51", 16, 24),
+            ("Amelogenin", "X", "Y"),
+            ("D5S818", 11, 12),
+            ("FGA", 22, 22)
+        ]
+
+        data_B = [
+            ("D8S1179", 11, 14),
+            ("D21S11", 29, 32.2),
+            ("D7S820", 8, 10),
+            ("CSF1PO", 12, 12),
+            ("D3S1358", 16, 16),
+            ("TH01", 9, 9),
+            ("D13S317", 8, 12),
+            ("D16S539", 9, 11),
+            ("D2S1338", 19, 21),
+            ("D19S433", 14, 15.2),
+            ("vWA", 16, 17),
+            ("TPOX", 8, 8),
+            ("D18S51", 15, 16),
+            ("Amelogenin", "X", "Y"),
+            ("D5S818", 10, 12),
+            ("FGA", 20, 21)
+        ]
+
+
+# Function to compare STR Locus between A and B
+def compare_STR_locus(data_A, data_B):
+    differences = []
+    is_match = True
+
+    # Iterate through each row
+    for i, (locus_A, locus_B) in enumerate(zip(data_A, data_B)):
+        locus_name = locus_A[0]  # The STR locus name
+        alleles_A = locus_A[1:]  # Alleles for A
+        alleles_B = locus_B[1:]  # Alleles for B
+
+        # Compare if all alleles match
+        if alleles_A != alleles_B:
+            # If any alleles do not match, log the differences
+            differences.append((locus_name, alleles_A, alleles_B))
+            is_match = False
+
+    # Summary
+    if is_match:
+        return "Both sets are identical. Conclusion: Yes"
+    else:
+        return f"STR Locus differences found: {differences}. Conclusion: No"
+## main
+    elif choice == '2':
+        # Compare STR Locus between A and B
+        # Data from the image can be used or user input can be added here
+        data_A = [
+            ("D8S1179", 11, 16),
+            ("D21S11", 29, 31.2),
+            ("D7S820", 10, 11),
+            ("CSF1PO", 12, 12),
+            ("D3S1358", 15, 15),
+            ("TH01", 7, 9),
+            ("D13S317", 8, 12),
+            ("D16S539", 9, 12),
+            ("D2S1338", 18, 19),
+            ("D19S433", 13, 14),
+            ("vWA", 14, 17),
+            ("TPOX", 8, 8),
+            ("D18S51", 16, 24),
+            ("Amelogenin", "X", "Y"),
+            ("D5S818", 11, 12),
+            ("FGA", 22, 22)
+        ]
+
+        data_B = [
+            ("D8S1179", 11, 14),
+            ("D21S11", 29, 32.2),
+            ("D7S820", 8, 10),
+            ("CSF1PO", 12, 12),
+            ("D3S1358", 16, 16),
+            ("TH01", 9, 9),
+            ("D13S317", 8, 12),
+            ("D16S539", 9, 11),
+            ("D2S1338", 19, 21),
+            ("D19S433", 14, 15.2),
+            ("vWA", 16, 17),
+            ("TPOX", 8, 8),
+            ("D18S51", 15, 16),
+            ("Amelogenin", "X", "Y"),
+            ("D5S818", 10, 12),
+            ("FGA", 20, 21)
+        ]
+
+        result = compare_STR_locus(data_A, data_B)
+        print(result)
