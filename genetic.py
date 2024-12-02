@@ -232,5 +232,4 @@ def main():
         print("Invalid choice. Please select 1, 2, or 3.")
 
 # Run the main function
-#Hello World
 main()
